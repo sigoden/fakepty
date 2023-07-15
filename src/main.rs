@@ -42,6 +42,9 @@ fn try_main() -> Result<i32> {
     })?;
 
     let mut command_builder = CommandBuilder::new(command);
+    if let Ok(dir) = env::current_dir() {
+        command_builder.cwd(dir);
+    }
     command_builder.args(env::args_os().skip(2));
 
     let mut child = pair.slave.spawn_command(command_builder)?;
