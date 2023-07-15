@@ -1,6 +1,6 @@
 [package]
 name = "fakepty"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 authors = ["sigoden <sigoden@gmail.com>"]
 description = "Run a command in a fake pty"
