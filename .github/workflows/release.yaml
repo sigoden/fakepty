@@ -106,7 +106,7 @@ jobs:
         set -euxo pipefail
 
         bin=${GITHUB_REPOSITORY##*/}
-        dist=dist
+        dist=./dist
         name=$bin-$version-$target
         executable=target/$target/release/$bin
 
