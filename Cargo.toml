@@ -1,0 +1,22 @@
+[package]
+name = "fakepty"
+version = "0.1.0"
+edition = "2021"
+authors = ["sigoden <sigoden@gmail.com>"]
+description = "Run a command in a fake pty"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/sigoden/fakepty"
+repository = "https://github.com/sigoden/fakepty"
+autotests = false
+categories = ["command-line-utilities"]
+keywords = ["command-line", "pty", "tty"]
+
+[dependencies]
+anyhow = "1.0.71"
+portable-pty = "0.8.1"
+terminal_size = "0.2.6"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"
