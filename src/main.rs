@@ -62,6 +62,8 @@ fn try_main() -> Result<i32> {
     let code = child.wait()?.exit_code() as i32;
     drop(pair.master);
     let output = rx.recv()?;
+    #[cfg(not(windows))]
+    let output = output.replace("\r\n", "\n");
     print!("{output}");
     Ok(code)
 }
