@@ -15,21 +15,21 @@ fn main() {
 }
 
 fn try_main() -> Result<i32> {
-    let program;
+    let command;
     if let Some(arg) = env::args().nth(1) {
         match arg.as_str() {
-            "-h" | "--help" => return print_help(0),
+            "-h" | "--help" => return print_help(),
             "-V" | "--version" => return print_version(),
-            _ => program = arg,
+            _ => command = arg,
         }
     } else {
-        return print_help(1);
+        return print_help();
     }
 
-    let program = if !program.contains(std::path::MAIN_SEPARATOR) {
-        which(program)?
+    let command = if !command.contains(std::path::MAIN_SEPARATOR) {
+        which(command)?
     } else {
-        PathBuf::from(program)
+        PathBuf::from(command)
     };
 
     let pty_system = NativePtySystem::default();
@@ -41,10 +41,10 @@ fn try_main() -> Result<i32> {
         pixel_height: 0,
     })?;
 
-    let mut cmd = CommandBuilder::new(program);
-    cmd.args(env::args_os().skip(2));
+    let mut command_builder = CommandBuilder::new(command);
+    command_builder.args(env::args_os().skip(2));
 
-    let mut child = pair.slave.spawn_command(cmd)?;
+    let mut child = pair.slave.spawn_command(command_builder)?;
 
     drop(pair.slave);
 
@@ -79,12 +79,27 @@ fn term_size() -> (u16, u16) {
     (cols, rows)
 }
 
-fn print_help(code: i32) -> Result<i32> {
-    println!("{} <program> [args...]", env!("CARGO_CRATE_NAME"));
-    Ok(code)
+fn print_help() -> Result<i32> {
+    println!(
+        r###"{}
+
+Usage: {} <command> [args...]
+
+Args:
+  <command>                  command to run in a fake pty
+  [args...]                  Args passed to command
+
+Options:
+  -h, --help                 Print help
+  -V, --version              Print version
+"###,
+        env!("CARGO_PKG_DESCRIPTION"),
+        env!("CARGO_CRATE_NAME")
+    );
+    Ok(0)
 }
 
 fn print_version() -> Result<i32> {
-    println!("{}", env!("CARGO_PKG_VERSION"));
+    println!("{} {}", env!("CARGO_CRATE_NAME"), env!("CARGO_PKG_VERSION"));
     Ok(0)
 }
