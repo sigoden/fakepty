@@ -1,7 +1,8 @@
 use anyhow::Result;
 use portable_pty::{CommandBuilder, NativePtySystem, PtySize, PtySystem};
-use std::{env, process, sync::mpsc::channel};
+use std::{env, path::PathBuf, process, sync::mpsc::channel};
 use terminal_size::terminal_size;
+use which::which;
 
 fn main() {
     match try_main() {
@@ -14,15 +15,22 @@ fn main() {
 }
 
 fn try_main() -> Result<i32> {
+    let program;
     if let Some(arg) = env::args().nth(1) {
         match arg.as_str() {
             "-h" | "--help" => return print_help(0),
             "-V" | "--version" => return print_version(),
-            _ => {}
+            _ => program = arg,
         }
     } else {
         return print_help(1);
     }
+
+    let program = if !program.contains(std::path::MAIN_SEPARATOR) {
+        which(program)?
+    } else {
+        PathBuf::from(program)
+    };
 
     let pty_system = NativePtySystem::default();
     let (cols, rows) = term_size();
@@ -33,9 +41,8 @@ fn try_main() -> Result<i32> {
         pixel_height: 0,
     })?;
 
-    let mut args = env::args_os().skip(1);
-    let mut cmd = CommandBuilder::new(args.next().unwrap());
-    cmd.args(args);
+    let mut cmd = CommandBuilder::new(program);
+    cmd.args(env::args_os().skip(2));
 
     let mut child = pair.slave.spawn_command(cmd)?;
 

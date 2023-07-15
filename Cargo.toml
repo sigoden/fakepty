@@ -15,6 +15,7 @@ keywords = ["command-line", "pty", "tty"]
 anyhow = "1.0.71"
 portable-pty = "0.8.1"
 terminal_size = "0.2.6"
+which = "4.4.0"
 
 [profile.release]
 lto = true
